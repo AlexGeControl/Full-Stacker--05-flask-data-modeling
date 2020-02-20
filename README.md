@@ -229,6 +229,25 @@ db.create_all()
 
 In SQL Alchemy transaction is managed as session:
 
+##### Life-Cycle
+
+* **Transient** an object exists, it was defined but not attached to a session (yet).
+    ```python
+    role_admin = Role(name='administrator')
+    ```
+* **Pending** an object was attached to a session. 
+    
+    "Undo" becomes available via 
+    ```python
+    db.session.rollback()
+    ```
+    Waits for a flush to happen
+
+* **Flushed** about ready to be committed to the database, **translating actions into SQL command statements for the engine**
+
+* **Committed** manually called for a change to persist to the database (permanently); session's transaction is cleared for a new set of changes
+
+
 ##### CREATE
 
 ```python
