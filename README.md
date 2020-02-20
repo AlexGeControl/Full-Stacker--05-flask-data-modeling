@@ -209,13 +209,18 @@ Multiple levels of abstraction you can prefer, between **the database driver** a
 
 ## Flask-SQLAlchemy
 
-### SQL Alchemy Basics
+#### SQL Alchemy Basics
+
+* **db.Model** Table creation through class defition
+* **db.session** transaction management
 
 #### Define Tables
 
 This will only affect SQL Alchemy models exported to flask shell context.
 
 ```python
+# SQL Alchemy will not create new table if it could find existing table with the same name as target table
+# so it's better to clear the history before we try
 db.drop_all()
 db.create_all()
 ```
@@ -276,4 +281,9 @@ user_admin = User.query.filter_by(role=role_admin).first()
 # inspect the generated SQL:
 str(User.query.filter_by(role=role_admin))
 ```
+
+#### Integrity
+
+[SQL Alchemy Constraints](https://docs.sqlalchemy.org/en/13/core/constraints.html#check-constraint)
+
 ---
