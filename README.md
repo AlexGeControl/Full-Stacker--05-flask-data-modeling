@@ -209,6 +209,71 @@ Multiple levels of abstraction you can prefer, between **the database driver** a
 
 ## Flask-SQLAlchemy
 
+### SQL Alchemy Basics
 
+#### Define Tables
 
+This will only affect SQL Alchemy models exported to flask shell context.
+
+```python
+db.drop_all()
+db.create_all()
+```
+
+#### Transactions
+
+In SQL Alchemy transaction is managed as session:
+
+##### CREATE
+
+```python
+# create roles:
+role_admin = Role(name = 'admin')
+role_mod = Role(name = 'moderator')
+role_user = Role(name = 'user')
+# create users:
+user_alex = User(username='Ge Alex', role=role_admin)
+user_daisy = User(username='Han Daisy', role=role_mod)
+user_zheng = User(username='Wu Zheng', role=role_user)
+
+# create transaction:
+db.session.add_all(
+   [
+      admin_role, mod_role, user_role,
+      user_john, user_susan, user_david
+   ]
+)
+# commit:
+db.session.commit()
+```
+
+##### UPDATE
+
+```python
+role_admin.name = 'administrator'
+db.session.add(role_admin)
+db.session.commit()
+```
+
+##### DELETE
+
+```python
+db.session.delete(role_admin)
+db.session.commit()
+```
+
+##### READ
+
+```python
+# SELECT * FROM roles;
+Role.query.all()
+# SELECT * FROM roles LIMIT 2;
+
+# identify role admin:
+role_admin = Role.query.filter_by(name='administrator').first()
+# filter users:
+user_admin = User.query.filter_by(role=role_admin).first()
+# inspect the generated SQL:
+str(User.query.filter_by(role=role_admin))
+```
 ---
