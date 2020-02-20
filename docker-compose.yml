@@ -6,9 +6,22 @@ services:
       context: ${PWD}/workspace/flask
       dockerfile: Dockerfile
     image: "backend"
+    environment:
+      - FLASK_APP=main.py
+      - FLASK_DEBUG=1
+      - FLASK_CONFIG=development
+      - DEV_DATABASE_URL=postgresql://udacity:udacity@db:5432/todoapp
+      - DATABASE_URL=postgresql://udacity:udacity@db:5432/todoapp
     ports:
       - "60080:80"
     volumes:
+      # remove the following for production with Dockerfile ADD
+      - ${PWD}/workspace/flask/application:/app/application
+      - ${PWD}/workspace/flask/migrations:/app/migrations
+      - ${PWD}/workspace/flask/tests:/app/tests
+      - ${PWD}/workspace/flask/config.py:/app/config.py
+      - ${PWD}/workspace/flask/main.py:/app/main.py
+      - ${PWD}/workspace/flask/requirements.txt:/app/requirements.txt
       - ${PWD}/workspace/psycopg2:/workspace/psycopg2
     depends_on:
       - db
