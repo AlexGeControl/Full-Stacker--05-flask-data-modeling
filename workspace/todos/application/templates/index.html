@@ -1,56 +1,61 @@
-<html>
-  <head>
-    <title>Todo App</title>
-    <style>
-      #error {
-        display: none;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="error" class="hidden">Something went wrong!</div>
-    <form id="form" method="post" action="/todos/create">
-      <input type="text" id="description" name="description" />
-      <input type="submit" value="Create" />
-    </form>
-    <ul id="todos">
-      {% for d in data %}
-      <li>{{ d.description }}</li>
-      {% endfor %}
-    </ul>
-    <script>
-      const descInput = document.getElementById('description');
-      document.getElementById('form').onsubmit = function(e) {
-        e.preventDefault();
-        const desc = descInput.value;
-        descInput.value = '';
-        
-        fetch(
-          '/todos/create', 
-          {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            method: 'POST',
-            body: JSON.stringify(
-              {
-                'description': desc,
-              }
-            )
-          }
-        )
-        .then(response => response.json())
-        .then(jsonResponse => {
-          console.log('response', jsonResponse);
-          li = document.createElement('li');
-          li.innerText = desc;
-          document.getElementById('todos').appendChild(li);
-          document.getElementById('error').className = 'hidden';
-        })
-        .catch(function() {
-          document.getElementById('error').className = '';
-        })
-      }
-    </script>
-  </body>
-</html>
+{% extends 'layouts/main.html' %}
+
+{% block title %}
+  Todos
+{% endblock %}
+
+{% block content %}
+  <div id="error" class="hidden">Something went wrong!</div>
+
+  <div class="row">
+      <div class="col-12">
+          <h3>Add New</h3>
+      </div>
+      <div class="col-12">
+          <form id="form" method="post" action="/todos/create">
+            <div class="form-group row">
+              <div class="col-8">
+                <input class="form-control" type="text" id="description" name="description" placeholder="Description" />
+              </div>
+              <div class="col-4">
+                <button class="btn btn-primary" type="submit">Create</button>
+              </div>
+            </div>
+          </form>
+      </div> 
+  </div>
+
+  <div class="row">
+      <div class="col-12">
+          <h3>Todos</h3>
+      </div>
+
+      <div class="col-12">
+        <ul class="list-group" id="todos">
+            {% for d in data %}
+            <li class="list-group-item" id="{{ d.id }}">                
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <div class="input-group-text">
+                    <input type="checkbox" 
+                      onclick="updateTodo(this)" data-id="{{ d.id }}" 
+                      {% if (d.completed) %} checked {% endif %}
+                    />                    
+                  </div>
+                  <span class="input-group-text">Mark as Completed</span>
+                </div>
+
+                <input class="form-control" type="text" placeholder="{{ d.description }}" disabled />
+
+                <div class="input-group-append">
+                  <button class="btn btn-outline-danger" type="button"
+                    onclick="deleteTodo(this)" data-id="{{ d.id }}"
+                  >&cross;</button>
+                </div>                
+              </div>    
+            </li>
+            {% endfor %}
+          </ul>
+      </div>
+  </div>
+{% endblock %}

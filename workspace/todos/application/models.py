@@ -10,3 +10,12 @@ class Todo(db.Model):
     
     def __repr__(self):
         return f'<Todo id={self.id} completed={self.completed} description={self.description}>'
+    
+    def to_dict(self):
+        data = {
+            "id": self.id,
+            "completed": self.completed,
+            "description": self.description
+        }
+
+        return data
