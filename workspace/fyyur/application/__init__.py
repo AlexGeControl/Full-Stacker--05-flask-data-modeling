@@ -35,7 +35,9 @@ def create_app(config_name):
     app.register_blueprint(blueprint_artist, url_prefix='/artists')
     from .show import show as blueprint_show
     app.register_blueprint(blueprint_show, url_prefix='/shows')
-    from .venue import venue as blueprint_venue
+    from .venue import bp as blueprint_venue
     app.register_blueprint(blueprint_venue, url_prefix='/venues')
 
     return app
+
+from . import models

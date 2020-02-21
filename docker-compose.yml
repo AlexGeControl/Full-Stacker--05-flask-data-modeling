@@ -43,6 +43,8 @@ services:
     volumes:
       # remove the following for production with Dockerfile ADD
       - ${PWD}/workspace/fyyur/application:/app/application
+      - ${PWD}/workspace/fyyur/data:/app/data
+      - ${PWD}/workspace/fyyur/init_db.py:/app/init_db.py
       - ${PWD}/workspace/fyyur/migrations:/app/migrations
       - ${PWD}/workspace/fyyur/tests:/app/tests
       - ${PWD}/workspace/fyyur/config.py:/app/config.py

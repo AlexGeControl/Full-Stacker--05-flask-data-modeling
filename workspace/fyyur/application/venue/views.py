@@ -1,6 +1,9 @@
+from application import db
+from application.models import Venue
+
 from flask import render_template, request, flash, redirect, url_for
 
-from . import venue
+from . import bp
 from .forms import VenueForm
 
 #  ----------------------------------------------------------------
@@ -9,12 +12,12 @@ from .forms import VenueForm
 
 #  CREATE
 #  ----------------------------------------------------------------
-@venue.route('/create', methods=['GET'])
+@bp.route('/create', methods=['GET'])
 def create_venue_form():
     form = VenueForm()
     return render_template('forms/new_venue.html', form=form)
 
-@venue.route('/create', methods=['POST'])
+@bp.route('/create', methods=['POST'])
 def create_venue_submission():
     # TODO: insert form data as a new Venue record in the db, instead
     # TODO: modify data to be the data object returned from db insertion
@@ -28,7 +31,7 @@ def create_venue_submission():
 
 #  READ
 #  ----------------------------------------------------------------
-@venue.route('/')
+@bp.route('/')
 def venues():
     # TODO: replace with real venues data.
     # #       num_shows should be aggregated based on number of upcoming shows per venue.
@@ -67,7 +70,7 @@ def venues():
         areas=data
     )
 
-@venue.route('/search', methods=['POST'])
+@bp.route('/search', methods=['POST'])
 def search_venues():
     # TODO: implement search on artists with partial string search. Ensure it is case-insensitive.
     # seach for Hop should return "The Musical Hop".
@@ -87,10 +90,11 @@ def search_venues():
         results=response, search_term=request.form.get('search_term', '')
     )
 
-@venue.route('/<int:venue_id>')
+@bp.route('/<int:venue_id>')
 def show_venue(venue_id):
-    # shows the venue page with the given venue_id
-    # TODO: replace with real venue data from the venues table, using venue_id
+    """ show given venue
+    """
+    '''
     data1={
         "id": 1,
         "name": "The Musical Hop",
@@ -174,43 +178,42 @@ def show_venue(venue_id):
         "past_shows_count": 1,
         "upcoming_shows_count": 1,
     }
-    
     data = list(filter(lambda d: d['id'] == venue_id, [data1, data2, data3]))[0]
+
+    return render_template('pages/show_venue.html', venue=data)
+    '''
+    # shows the venue page with the given venue_id
+    data = Venue.query.get_or_404(venue_id, description='There is no venue with id={}'.format(venue_id)).to_json()
+
+    # TODO: past & upcoming shows generation
+    data["past_shows"] = []
+    data["upcoming_shows"] = []
+    data["past_shows_count"] = len(data["past_shows"])
+    data["upcoming_shows_count"] = len(data["upcoming_shows"])
+
     return render_template('pages/show_venue.html', venue=data)
 
 #  UPDATE
 #  ----------------------------------------------------------------
-@venue.route('/<int:venue_id>/edit', methods=['GET'])
+@bp.route('/<int:venue_id>/edit', methods=['GET'])
 def edit_venue(venue_id):
-    form = VenueForm()
-    venue={
-        "id": 1,
-        "name": "The Musical Hop",
-        "genres": ["Jazz", "Reggae", "Swing", "Classical", "Folk"],
-        "address": "1015 Folsom Street",
-        "city": "San Francisco",
-        "state": "CA",
-        "phone": "123-123-1234",
-        "website": "https://www.themusicalhop.com",
-        "facebook_link": "https://www.facebook.com/TheMusicalHop",
-        "seeking_talent": True,
-        "seeking_description": "We are on the lookout for a local artist to play every two weeks. Please call us.",
-        "image_link": "https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60"
-    }
-    # TODO: populate form with values from venue with ID <venue_id>
+    """ render edit form pre-filled with venue
+    """
+    venue = Venue.query.get_or_404(venue_id, description='There is no venue with id={}'.format(venue_id))
+    form = VenueForm(obj=venue)
 
     return render_template('forms/edit_venue.html', form=form, venue=venue)
 
-@venue.route('/<int:venue_id>/edit', methods=['POST'])
+@bp.route('/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
     # TODO: take values from the form submitted, and update existing
     # venue record with ID <venue_id> using the new attributes
 
-    return redirect(url_for('show.show_venue', venue_id=venue_id))
+    return redirect(url_for('venue.show_venue', venue_id=venue_id))
 
 #  DELETE
 #  ----------------------------------------------------------------
-@venue.route('/<venue_id>', methods=['DELETE'])
+@bp.route('/<venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
     # TODO: Complete this endpoint for taking a venue_id, and using
     # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.

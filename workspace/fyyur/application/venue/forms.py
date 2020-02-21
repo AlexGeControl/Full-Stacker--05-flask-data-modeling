@@ -9,6 +9,10 @@ class VenueForm(Form):
     name = StringField(
         'name', validators=[DataRequired()]
     )
+    image_link = StringField(
+        'image_link', validators=[URL()]
+    )
+
     city = StringField(
         'city', validators=[DataRequired()]
     )
@@ -71,15 +75,28 @@ class VenueForm(Form):
     address = StringField(
         'address', validators=[DataRequired()]
     )
+
     phone = StringField(
         'phone'
     )
-    image_link = StringField(
-        'image_link'
+    website = StringField(
+        'website', validators=[URL()]
     )
+    facebook_link = StringField(
+        'facebook_link', validators=[URL()]
+    )
+
     genres = SelectMultipleField(
-        # TODO implement enum restriction
-        'genres', validators=[DataRequired()],
+        'genres', validators=[
+            DataRequired(),
+            # TODO implement enum restriction
+            AnyOf(
+                [
+                    'Alternative',
+                    'Blues',                  
+                ]
+            )
+        ],
         choices=[
             ('Alternative', 'Alternative'),
             ('Blues', 'Blues'),
@@ -101,7 +118,4 @@ class VenueForm(Form):
             ('Soul', 'Soul'),
             ('Other', 'Other'),
         ]
-    )
-    facebook_link = StringField(
-        'facebook_link', validators=[URL()]
     )
