@@ -3,7 +3,7 @@ import os
 from application import create_app, db
 from flask_migrate import Migrate
 
-from application.models import Todo
+from application.models import TodoList, Todo
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 Migrate(app, db)
@@ -11,4 +11,4 @@ Migrate(app, db)
 @app.shell_context_processor
 def make_shell_context():
     # make extra variables available in flask shell context:    
-    return dict(db=db, Todo=Todo)
+    return dict(db=db, TodoList=TodoList, Todo=Todo)

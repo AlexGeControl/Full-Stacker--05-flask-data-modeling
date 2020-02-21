@@ -1,5 +1,5 @@
 from application import db
-from application.models import Todo
+from application.models import TodoList, Todo
 
 from flask import render_template
 
@@ -11,4 +11,7 @@ from . import bp
 def index():
     """ home page
     """
-    return render_template('index.html', data=Todo.query.all())
+    lists = TodoList.query.all()
+    todos = TodoList.query.first().todos
+
+    return render_template('index.html', lists=lists, todos=todos)

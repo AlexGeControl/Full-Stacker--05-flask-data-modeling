@@ -8,54 +8,92 @@
   <div id="error" class="hidden">Something went wrong!</div>
 
   <div class="row">
-      <div class="col-12">
-          <h3>Add New</h3>
-      </div>
-      <div class="col-12">
-          <form id="form" method="post" action="/todos/create">
-            <div class="form-group row">
-              <div class="col-8">
-                <input class="form-control" type="text" id="description" name="description" placeholder="Description" />
-              </div>
-              <div class="col-4">
-                <button class="btn btn-primary" type="submit">Create</button>
-              </div>
-            </div>
-          </form>
-      </div> 
-  </div>
-
-  <div class="row">
-      <div class="col-12">
-          <h3>Todos</h3>
-      </div>
-
-      <div class="col-12">
-        <ul class="list-group" id="todos">
-            {% for d in data %}
-            <li class="list-group-item" id="{{ d.id }}">                
-              <div class="input-group">
-                <div class="input-group-prepend">
-                  <div class="input-group-text">
-                    <input type="checkbox" 
-                      onclick="updateTodo(this)" data-id="{{ d.id }}" 
-                      {% if (d.completed) %} checked {% endif %}
-                    />                    
+    <div class="col-6">
+        <div class="col-12">
+            <h2>Todo Lists</h2>
+        </div>
+  
+        <div class="col-12">
+          <ul class="list-group" id="todos">
+              {% for d in data %}
+              <li class="list-group-item" id="{{ d.id }}">                
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <div class="input-group-text">
+                      <input type="checkbox" 
+                        onclick="updateTodo(this)" data-id="{{ d.id }}" 
+                        {% if (d.completed) %} checked {% endif %}
+                      />                    
+                    </div>
+                    <span class="input-group-text">Mark as Completed</span>
                   </div>
-                  <span class="input-group-text">Mark as Completed</span>
-                </div>
+  
+                  <input class="form-control" type="text" placeholder="{{ d.description }}" disabled />
+  
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-danger" type="button"
+                      onclick="deleteTodo(this)" data-id="{{ d.id }}"
+                    >&cross;</button>
+                  </div>                
+                </div>    
+              </li>
+              {% endfor %}
+            </ul>
+        </div>
+    </div>
 
-                <input class="form-control" type="text" placeholder="{{ d.description }}" disabled />
-
-                <div class="input-group-append">
-                  <button class="btn btn-outline-danger" type="button"
-                    onclick="deleteTodo(this)" data-id="{{ d.id }}"
-                  >&cross;</button>
-                </div>                
-              </div>    
-            </li>
-            {% endfor %}
-          </ul>
-      </div>
+    <div class="col-6">
+        <div class="row">
+            <div class="col-12">
+                <h3>Add New</h3>
+            </div>
+            <div class="col-12">
+                <form id="form" method="post" action="/todos/create">
+                  <div class="form-group row">
+                    <div class="col-8">
+                      <input class="form-control" type="text" id="description" name="description" placeholder="Description" />
+                    </div>
+                    <div class="col-4">
+                      <button class="btn btn-primary" type="submit">Create</button>
+                    </div>
+                  </div>
+                </form>
+            </div> 
+        </div>
+      
+        <div class="row">
+            <div class="col-12">
+                <h3>Todos</h3>
+            </div>
+      
+            <div class="col-12">
+              <ul class="list-group" id="todos">
+                  {% for d in data %}
+                  <li class="list-group-item" id="{{ d.id }}">                
+                    <div class="input-group">
+                      <div class="input-group-prepend">
+                        <div class="input-group-text">
+                          <input type="checkbox" 
+                            onclick="updateTodo(this)" data-id="{{ d.id }}" 
+                            {% if (d.completed) %} checked {% endif %}
+                          />                    
+                        </div>
+                        <span class="input-group-text">Mark as Completed</span>
+                      </div>
+      
+                      <input class="form-control" type="text" placeholder="{{ d.description }}" disabled />
+      
+                      <div class="input-group-append">
+                        <button class="btn btn-outline-danger" type="button"
+                          onclick="deleteTodo(this)" data-id="{{ d.id }}"
+                        >&cross;</button>
+                      </div>                
+                    </div>    
+                  </li>
+                  {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
   </div>
 {% endblock %}

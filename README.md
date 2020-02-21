@@ -382,3 +382,49 @@ Migrations deal with how we manage modifications to our data schema, over time. 
 * There should be a 1-1 mapping between the changes made to our database, and the migration files that exist in our migrations folder
 * Migrations files set up the tables for our database.
 * All changes made to our db should exist physically as part of migration files in our repository.
+
+### Relationships
+
+#### Flask SQLAlchemy Elements
+
+![SQLAlchemy Relationship](doc/sqlalchemy-relationship.png "SQLAlchemy Relationship")
+
+* **db.relationship**
+    * Should be defined on **parent** model
+    * **Left value** specifies the name of children on parent
+    * the name of a parent on a child using the parameter **backref**
+    * Example
+    ```python
+    children = db.relationship('Child', backref='parent', lazy=True)
+    ```
+
+* **db.ForeignKe**
+    * Whereas we set **db.relationship** on the parent model, we set the foreign key constraint on the child model
+    * A foreign key constraint ensures **referential integrity** from one table to another, by ensuring that the foreign key column always maps a primary key in the foreign table
+    * Example
+    ```python
+    parent_id = db.Column(db.Integer, db.ForeignKey('parents.id'), nullable=False)
+    ```
+
+#### Loading
+
+* **Lazy loading** Load needed joined data only when being referred. Default in SQLAlchemy.
+
+    ```python
+    lazy = True
+    ```
+    * **Pro**: No initial wait time. Load only what you need.
+    * **Con**: Produces a join SQL call every time there is a request for a joined asset. Bad if you do this a lot. 
+
+* **Eager loading** Load all needed joined data objects, all at once.
+
+    ```python
+    lazy = False
+    ```
+    * **Pro**: Reduces further queries to the database. Subsequent SQL calls read existing data.
+    * **Con**: Loading the joined table has a long upfront initial load time.
+
+#### Cascade
+
+[Cascade](https://docs.sqlalchemy.org/en/13/orm/relationship_api.html#sqlalchemy.orm.relationship)
+
