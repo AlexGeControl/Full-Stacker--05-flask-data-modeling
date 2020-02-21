@@ -35,7 +35,7 @@ class DevelopmentConfig(Config):
     
     # TODO IMPLEMENT DEV DATABASE URL
     SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \
-        'postgresql://udacity:udacity@db:5432/fyyurapp'
+        'postgresql://udacity:udacity@db:5432/todoapp'
 
 class TestingConfig(Config):
     TESTING = True
@@ -50,7 +50,7 @@ class ProductionConfig(Config):
     
     # TODO IMPLEMENT DATABASE URL
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'postgresql://udacity:udacity@db:5432/fyyurapp'
+        'postgresql://udacity:udacity@db:5432/todoapp'
 
 # configs:
 config = {
