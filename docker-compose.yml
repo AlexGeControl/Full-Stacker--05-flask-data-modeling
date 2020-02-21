@@ -1,6 +1,32 @@
 version: '3.4'
 
 services:
+  fyyur:
+    build:
+      context: ${PWD}/workspace/fyyur
+      dockerfile: Dockerfile
+    image: "fyyur"
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_DEBUG=true
+      - FLASK_CONFIG=development
+      - DEV_DATABASE_URL=postgresql://udacity:udacity@db:5432/todoapp
+      - STATIC_PATH=/app/application/static
+    ports:
+      - "60080:80"
+    volumes:
+      # remove the following for production with Dockerfile ADD
+      - ${PWD}/workspace/fyyur/application:/app/application
+      - ${PWD}/workspace/fyyur/migrations:/app/migrations
+      - ${PWD}/workspace/fyyur/tests:/app/tests
+      - ${PWD}/workspace/fyyur/config.py:/app/config.py
+      - ${PWD}/workspace/fyyur/app.py:/app/app.py
+      - ${PWD}/workspace/fyyur/requirements.txt:/app/requirements.txt
+      - ${PWD}/workspace/fyyur/uwsgi.ini:/app/uwsgi.ini      
+    depends_on:
+      - db
+      - adminer
+
   backend:
     build:
       context: ${PWD}/workspace/flask
