@@ -17,7 +17,7 @@ class Venue(db.Model):
 
     name = db.Column(db.String, nullable=False)
     image_link = db.Column(db.String(500), nullable=True)
-    
+
     city = db.Column(db.String(120), nullable=False)
     state = db.Column(db.String(120), nullable=False)
     address = db.Column(db.String(120), nullable=False)
@@ -30,18 +30,23 @@ class Venue(db.Model):
 
     seeking_talent = db.Column(db.Boolean, nullable=False, default=False)
     seeking_description = db.Column(db.String, nullable=True)
-    
+
+    def __repr__(self):
+        return f'<Venue id="{self.id}" name="{self.name}" city="{self.city}" state="{self.state}">'
+
     def to_json(self):
         """ map venue object to python dict
         """
         data = {
+            "id": self.id,
+
             "name": self.name,
+            "image_link": self.image_link,
 
             "city": self.city,
             "state": self.state,
             "address": self.address,
 
-            "image_link": self.image_link,
             "phone": self.phone,
             "website": self.website,
             "facebook_link": self.facebook_link,
@@ -53,6 +58,25 @@ class Venue(db.Model):
         }
 
         return data
+
+    def from_json(self, json):
+        """ update venue object using python dict input
+        """
+        self.name = json.get('name', '')
+        self.image_link = json.get('image_link', '')
+        
+        self.city = json.get('city', '')
+        self.state = json.get('state', '')
+        self.address = json.get('address', '')
+
+        self.phone = json.get('phone', '')
+        self.website = json.get('website', '')
+        self.facebook_link = json.get('facebook_link', '')
+
+        self.genres = json.get('genres', [])
+
+        self.seeking_talent = (json.get('seeking_talent', 'n') == 'y')
+        self.seeking_description = json.get('seeking_description', '')
 
 class Artist(db.Model):
     """ table artists

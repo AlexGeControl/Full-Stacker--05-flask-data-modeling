@@ -1,10 +1,12 @@
 from application import db
 from application.models import Venue
 
-from flask import render_template, request, flash, redirect, url_for
+from flask import abort, render_template, request, flash, redirect, url_for
 
 from . import bp
 from .forms import VenueForm
+from application.utils import convert_form_dict_to_dict
+from itertools import groupby
 
 #  ----------------------------------------------------------------
 #  routes
@@ -14,80 +16,101 @@ from .forms import VenueForm
 #  ----------------------------------------------------------------
 @bp.route('/create', methods=['GET'])
 def create_venue_form():
+    """ render empty form
+    """
     form = VenueForm()
     return render_template('forms/new_venue.html', form=form)
 
 @bp.route('/create', methods=['POST'])
 def create_venue_submission():
-    # TODO: insert form data as a new Venue record in the db, instead
-    # TODO: modify data to be the data object returned from db insertion
+    """ create new venue using POSTed form
+    """
+    # parse POSTed form:
+    venue_created = convert_form_dict_to_dict(request.form)
+    # parse venue name:
+    venue_name = venue_created["name"]
 
-    # on successful db insert, flash success
-    flash('Venue ' + request.form['name'] + ' was successfully listed!')
-    # TODO: on unsuccessful db insert, flash an error instead.
-    # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
-    # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
+    try:
+        venue = Venue(**venue_created)
+        db.session.add(venue)
+        db.session.commit()
+        # on successful db insert, flash success
+        flash('Venue ' + venue_name + ' was successfully listed!')
+    except:
+        db.session.rollback()
+        # on unsuccessful db insert, flash an error instead.
+        flash('An error occurred. Venue ' + venue_name + ' could not be listed.')
+    finally:
+        db.session.close()
+    
     return render_template('pages/home.html')
 
 #  READ
 #  ----------------------------------------------------------------
-@bp.route('/')
+@bp.route('/', methods=['GET', 'DELETE'])
 def venues():
-    # TODO: replace with real venues data.
-    # #       num_shows should be aggregated based on number of upcoming shows per venue.
-    data=[
+    # fetch data:
+    data = Venue.query.with_entities(
+        Venue.city,
+        Venue.state,
+        Venue.id,
+        Venue.name
+    ).group_by(
+        Venue.id,
+        Venue.name
+    ).all()
+
+    # format as areas:
+    areas = [
         {
-            "city": "San Francisco",
-            "state": "CA",
+            "city": city,
+            "state": state,
             "venues": [
                 {
-                    "id": 1,
-                    "name": "The Musical Hop",
+                    "id": id,
+                    "name": name,
+                    # TODO: upcoming show count generation
                     "num_upcoming_shows": 0,
-                }, 
-                {
-                    "id": 3,
-                    "name": "Park Square Live Music & Coffee",
-                    "num_upcoming_shows": 1,
-                }
+                } for (_, _, id, name) in venues               
             ]
-        }, 
-        {
-            "city": "New York",
-            "state": "NY",
-            "venues": [
-                {
-                    "id": 2,
-                    "name": "The Dueling Pianos Bar",
-                    "num_upcoming_shows": 0,
-                }
-            ]
-        }
+        } for (city, state), venues in groupby(data, lambda x: (x[0], x[1]))
     ]
-    
+
+
     return render_template(
-        'pages/venues.html', 
-        areas=data
+        "pages/venues.html", 
+        areas=areas
     )
 
 @bp.route('/search', methods=['POST'])
 def search_venues():
-    # TODO: implement search on artists with partial string search. Ensure it is case-insensitive.
+    """ search on venue names with partial string search. case-insensitive.
+    """
     # seach for Hop should return "The Musical Hop".
     # search for "Music" should return "The Musical Hop" and "Park Square Live Music & Coffee"
-    response={
-        "count": 1,
+    search_term = request.form.get('search_term', '')
+
+    data = Venue.query.with_entities(
+        Venue.id,
+        Venue.name
+    ).filter(
+        Venue.name.ilike(search_term)
+    ).all()
+
+    results={
+        "count": len(data),
         "data": [
             {
-                "id": 2,
-                "name": "The Dueling Pianos Bar",
+                "id": id,
+                "name": name,
                 "num_upcoming_shows": 0,
-            }
+            } for (id, name) in data
         ]
     }
+
     return render_template(
         'pages/search_venues.html', 
-        results=response, search_term=request.form.get('search_term', '')
+        results=results, search_term=search_term
     )
 
 @bp.route('/<int:venue_id>')
@@ -197,7 +220,7 @@ def show_venue(venue_id):
 #  ----------------------------------------------------------------
 @bp.route('/<int:venue_id>/edit', methods=['GET'])
 def edit_venue(venue_id):
-    """ render edit form pre-filled with venue
+    """ render form pre-filled with venue
     """
     venue = Venue.query.get_or_404(venue_id, description='There is no venue with id={}'.format(venue_id))
     form = VenueForm(obj=venue)
@@ -206,8 +229,32 @@ def edit_venue(venue_id):
 
 @bp.route('/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
-    # TODO: take values from the form submitted, and update existing
-    # venue record with ID <venue_id> using the new attributes
+    """ edit venue using POSTed form
+    """
+    # parse POSTed form:
+    venue_updated = convert_form_dict_to_dict(request.form)
+    # parse venue name:
+    venue_name = venue_updated["name"]
+    print(venue_updated)
+
+    try:
+        # read:
+        venue = Venue.query.get_or_404(venue_id, description='There is no venue with id={}'.format(venue_id))
+        # update:
+        print(repr(venue))
+        venue.from_json(venue_updated)
+        print(repr(venue))
+        db.session.add(venue)
+        # write
+        db.session.commit()
+        # on successful db insert, flash success
+        flash('Venue ' + venue_name + ' was successfully updated!')
+    except:
+        db.session.rollback()
+        # on unsuccessful db insert, flash an error instead.
+        flash('An error occurred. Venue ' + venue_name + ' could not be updated.')
+    finally:
+        db.session.close()
 
     return redirect(url_for('venue.show_venue', venue_id=venue_id))
 
@@ -215,9 +262,29 @@ def edit_venue_submission(venue_id):
 #  ----------------------------------------------------------------
 @bp.route('/<venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
-    # TODO: Complete this endpoint for taking a venue_id, and using
-    # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
+    """ delete venue
+    """
+    error = True
 
-    # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
-    # clicking that button delete it from the db then redirect the user to the homepage
-    return None
+    try:
+        # find:
+        venue = Venue.query.get_or_404(venue_id, description='There is no venue with id={}'.format(venue_id))
+        venue_name = venue.name
+        db.session.delete(venue)
+        # write
+        db.session.commit()
+        # on successful db insert, flash success
+        flash('Venue ' + venue_name + ' was successfully deleted!')
+        error = False
+    except:
+        db.session.rollback()
+        # on unsuccessful db insert, flash an error instead.
+        flash('An error occurred. Venue could not be deleted.')
+        error = True
+    finally:
+        db.session.close()
+
+    if error:
+        abort(400)
+
+    return redirect(url_for('.venues'))

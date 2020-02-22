@@ -1,18 +1,19 @@
 from datetime import datetime
 from flask_wtf import Form
-from wtforms import StringField, SelectField, SelectMultipleField, DateTimeField
+from wtforms import BooleanField, StringField, TextAreaField, SelectField, SelectMultipleField, DateTimeField
 from wtforms.validators import DataRequired, AnyOf, URL
 
 
 # TODO IMPLEMENT NEW ARTIST FORM AND NEW SHOW FORM
 class VenueForm(Form):
+    # personal info:
     name = StringField(
         'name', validators=[DataRequired()]
     )
     image_link = StringField(
         'image_link', validators=[URL()]
     )
-
+    # address:
     city = StringField(
         'city', validators=[DataRequired()]
     )
@@ -75,7 +76,7 @@ class VenueForm(Form):
     address = StringField(
         'address', validators=[DataRequired()]
     )
-
+    # contact:
     phone = StringField(
         'phone'
     )
@@ -85,7 +86,7 @@ class VenueForm(Form):
     facebook_link = StringField(
         'facebook_link', validators=[URL()]
     )
-
+    # genres:
     genres = SelectMultipleField(
         'genres', validators=[
             DataRequired(),
@@ -118,4 +119,11 @@ class VenueForm(Form):
             ('Soul', 'Soul'),
             ('Other', 'Other'),
         ]
+    )
+    # talent seeking:
+    seeking_talent = BooleanField(
+        'seeking_talent', default='n'
+    )
+    seeking_description = TextAreaField(
+        'seeking_description', default=''
     )

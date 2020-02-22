@@ -27,3 +27,10 @@ def create_file_handler(basedir):
     file_handler.setLevel(logging.INFO)
 
     return file_handler
+
+def convert_form_dict_to_dict(form_dict):
+    json = {
+        key: (value[0] if len(value) == 1 else value) for key, value in form_dict.to_dict(flat=False).items()
+    }
+
+    return json

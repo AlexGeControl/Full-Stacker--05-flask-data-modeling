@@ -6,9 +6,20 @@
 		<h1 class="monospace">
 			{{ venue.name }}
 		</h1>
+
+		<div class="btn-group btn-group-justified m-4">
+			<a href="/venues/{{ venue.id }}/edit" class="btn btn-outline-warning" role="button">
+				<span class="fa fa-edit"></span>EDIT
+			</a>
+			<a class="btn btn-outline-danger" role="button" onclick="deleteVenue(this)" data-id="{{ venue.id }}">
+				<span class="fa fa-trash"></span>DELETE
+			</a>
+		</div>
+
 		<p class="subtitle">
-			ID: {{ venue.id }}
+			GENERES
 		</p>
+
 		<div class="genres">
 			{% for genre in venue.genres %}
 			<span class="genre">{{ genre }}</span>
@@ -29,6 +40,7 @@
 		<p>
 			<i class="fab fa-facebook-f"></i> {% if venue.facebook_link %}<a href="{{ venue.facebook_link }}" target="_blank">{{ venue.facebook_link }}</a>{% else %}No Facebook Link{% endif %}
 		</p>
+
 		{% if venue.seeking_talent %}
 		<div class="seeking">
 			<p class="lead">Currently seeking talent</p>
