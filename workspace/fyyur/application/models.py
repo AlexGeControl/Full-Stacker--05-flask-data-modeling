@@ -7,6 +7,84 @@ from sqlalchemy.dialects.postgresql import ARRAY
 #----------------------------------------------------------------------------#
 # Models.
 #----------------------------------------------------------------------------#
+class Artist(db.Model):
+    """ table artists
+    """
+    # follow the best practice
+    __tablename__ = 'artists'
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    name = db.Column(db.String, nullable=False)
+    image_link = db.Column(db.String(500), nullable=True)
+
+    city = db.Column(db.String(120), nullable=False)
+    state = db.Column(db.String(120), nullable=False)
+
+    phone = db.Column(db.String(120), nullable=False)
+    website = db.Column(db.String(120), nullable=True)
+    facebook_link = db.Column(db.String(120), nullable=True)
+
+    genres = db.Column(ARRAY(db.String), nullable=False)
+
+    seeking_venue = db.Column(db.Boolean, nullable=False, default=False)
+    seeking_description = db.Column(db.String, nullable=True)
+
+    def __repr__(self):
+        return f'<Artist id="{self.id}" name="{self.name}" city="{self.city}" state="{self.state}">'
+
+    def to_json(self):
+        """ map artist object to python dict
+        """
+        data = {
+            "id": self.id,
+
+            "name": self.name,
+            "image_link": self.image_link,
+
+            "city": self.city,
+            "state": self.state,
+
+            "phone": self.phone,
+            "website": self.website,
+            "facebook_link": self.facebook_link,
+
+            "genres": self.genres,
+
+            "seeking_venue": self.seeking_venue,
+            "seeking_description": self.seeking_description
+        }
+
+        return data
+
+    def from_json(self, json):
+        """ update artist object using python dict input
+        """
+        self.name = json.get('name', '')
+        self.image_link = json.get('image_link', '')
+        
+        self.city = json.get('city', '')
+        self.state = json.get('state', '')
+
+        self.phone = json.get('phone', '')
+        self.website = json.get('website', '')
+        self.facebook_link = json.get('facebook_link', '')
+
+        self.genres = json.get('genres', [])
+
+        self.seeking_venue = (json.get('seeking_venue', 'n') == 'y')
+        self.seeking_description = json.get('seeking_description', '')
+
+
+class Show(db.Model):
+    """ table shows
+    """
+    # follow the best practice
+    __tablename__ = 'shows'
+
+    id = db.Column(db.Integer, primary_key=True)
+
+
 class Venue(db.Model):
     """ table venues
     """
@@ -22,7 +100,7 @@ class Venue(db.Model):
     state = db.Column(db.String(120), nullable=False)
     address = db.Column(db.String(120), nullable=False)
 
-    phone = db.Column(db.String(120), nullable=True)
+    phone = db.Column(db.String(120), nullable=False)
     website = db.Column(db.String(120), nullable=True)
     facebook_link = db.Column(db.String(120), nullable=True)
 
@@ -77,31 +155,3 @@ class Venue(db.Model):
 
         self.seeking_talent = (json.get('seeking_talent', 'n') == 'y')
         self.seeking_description = json.get('seeking_description', '')
-
-class Artist(db.Model):
-    """ table artists
-    """
-    # follow the best practice
-    __tablename__ = 'artists'
-
-    id = db.Column(db.Integer, primary_key=True)
-
-    name = db.Column(db.String)
-    genres = db.Column(ARRAY(db.String), nullable=False)
-    city = db.Column(db.String(120))
-    state = db.Column(db.String(120))
-    phone = db.Column(db.String(120))
-    genres = db.Column(db.String(120))
-    image_link = db.Column(db.String(500))
-    facebook_link = db.Column(db.String(120))
-
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
-
-# TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
-class Show(db.Model):
-    """ table shows
-    """
-    # follow the best practice
-    __tablename__ = 'shows'
-
-    id = db.Column(db.Integer, primary_key=True)

@@ -47,8 +47,10 @@ def create_venue_submission():
 
 #  READ
 #  ----------------------------------------------------------------
-@bp.route('/', methods=['GET', 'DELETE'])
+@bp.route('/', methods=['GET'])
 def venues():
+    """ list all venues
+    """
     # fetch data:
     data = Venue.query.with_entities(
         Venue.city,
@@ -82,19 +84,29 @@ def venues():
         areas=areas
     )
 
-@bp.route('/search', methods=['POST'])
-def search_venues():
+@bp.route('/search', methods=['GET'])
+def search_venues_form():
     """ search on venue names with partial string search. case-insensitive.
     """
     # seach for Hop should return "The Musical Hop".
     # search for "Music" should return "The Musical Hop" and "Park Square Live Music & Coffee"
-    search_term = request.form.get('search_term', '')
+    return render_template(
+        'pages/search_venues.html'
+    )
+
+@bp.route('/search', methods=['POST'])
+def search_venues_submission():
+    """ search on venue names with partial string search. case-insensitive.
+    """
+    # seach for Hop should return "The Musical Hop".
+    # search for "Music" should return "The Musical Hop" and "Park Square Live Music & Coffee"
+    keyword = request.form.get('keyword', '')
 
     data = Venue.query.with_entities(
         Venue.id,
         Venue.name
     ).filter(
-        Venue.name.ilike(search_term)
+        Venue.name.contains(keyword)
     ).all()
 
     results={
@@ -110,7 +122,7 @@ def search_venues():
 
     return render_template(
         'pages/search_venues.html', 
-        results=results, search_term=search_term
+        results=results, keyword=keyword
     )
 
 @bp.route('/<int:venue_id>')
@@ -235,15 +247,12 @@ def edit_venue_submission(venue_id):
     venue_updated = convert_form_dict_to_dict(request.form)
     # parse venue name:
     venue_name = venue_updated["name"]
-    print(venue_updated)
 
     try:
         # read:
         venue = Venue.query.get_or_404(venue_id, description='There is no venue with id={}'.format(venue_id))
         # update:
-        print(repr(venue))
         venue.from_json(venue_updated)
-        print(repr(venue))
         db.session.add(venue)
         # write
         db.session.commit()
@@ -287,4 +296,4 @@ def delete_venue(venue_id):
     if error:
         abort(400)
 
-    return redirect(url_for('.venues'))
+    return render_template('pages/home.html')

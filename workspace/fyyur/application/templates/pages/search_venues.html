@@ -1,17 +1,45 @@
 {% extends 'layouts/main.html' %}
-{% block title %}Fyyur | Venues Search{% endblock %}
+
+{% block title %}
+	Fyyur | Venues Search
+{% endblock %}
+
 {% block content %}
-<h3>Number of search results for "{{ search_term }}": {{ results.count }}</h3>
-<ul class="items">
-	{% for venue in results.data %}
-	<li>
-		<a href="/venues/{{ venue.id }}">
-			<i class="fas fa-music"></i>
-			<div class="item">
-				<h5>{{ venue.name }}</h5>
+<div class="row justify-content-center">
+	<div class="col-12">
+		<h1 class="monospace">SEARCH VENUES</h3>
+	</div>
+
+	<div class="col-12">
+		<form method="post" action="/venues/search">
+			<div class="form-group row">
+				<div class="col-sm-10">
+					<input class="form-control" type="text" id="keyword" name="keyword" placeholder="Keyword in Venue Name">
+				</div>
+				<div class="col-sm-2 offset-sm-10">
+					<button class="btn btn-primary" type="submit">Search</button>
+				</div>
 			</div>
-		</a>
-	</li>
-	{% endfor %}
-</ul>
+		</form>
+	</div>
+	
+	{% if results and keyword %}
+	<p class="subtitle">
+		NUM. OF RESULTS FOR "{{ keyword }}": {{ results.count }}
+	</p>	
+	
+	<ul class="items">
+		{% for venue in results.data %}
+		<li>
+			<a href="/venues/{{ venue.id }}">
+				<i class="fas fa-music"></i>
+				<div class="item">
+					<h5>{{ venue.name }}</h5>
+				</div>
+			</a>
+		</li>
+		{% endfor %}
+	</ul>
+	{% endif %}
+</div>
 {% endblock %}

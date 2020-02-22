@@ -4,7 +4,6 @@ from wtforms import BooleanField, StringField, TextAreaField, SelectField, Selec
 from wtforms.validators import DataRequired, AnyOf, URL
 
 
-# TODO IMPLEMENT NEW ARTIST FORM AND NEW SHOW FORM
 class VenueForm(Form):
     # personal info:
     name = StringField(
@@ -122,8 +121,8 @@ class VenueForm(Form):
     )
     # talent seeking:
     seeking_talent = BooleanField(
-        'seeking_talent', default='n'
+        'seeking_talent',
     )
     seeking_description = TextAreaField(
-        'seeking_description', default=''
+        'seeking_description',
     )

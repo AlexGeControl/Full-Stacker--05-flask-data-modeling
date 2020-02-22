@@ -31,7 +31,7 @@ def create_app(config_name):
     from .main import main as blueprint_main
     app.register_blueprint(blueprint_main)
 
-    from .artist import artist as blueprint_artist
+    from .artist import bp as blueprint_artist
     app.register_blueprint(blueprint_artist, url_prefix='/artists')
     from .show import show as blueprint_show
     app.register_blueprint(blueprint_show, url_prefix='/shows')

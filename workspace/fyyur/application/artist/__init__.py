@@ -1,5 +1,5 @@
 from flask import Blueprint
 
-artist = Blueprint('artist', __name__)
+bp = Blueprint('artist', __name__)
 
 from . import forms, views

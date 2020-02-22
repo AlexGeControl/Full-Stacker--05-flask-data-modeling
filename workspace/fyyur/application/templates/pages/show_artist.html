@@ -6,9 +6,20 @@
 		<h1 class="monospace">
 			{{ artist.name }}
 		</h1>
+
+		<div class="btn-group btn-group-justified m-4">
+			<a href="/artists/{{ artist.id }}/edit" class="btn btn-outline-warning" role="button">
+				<span class="fa fa-edit"></span>EDIT
+			</a>
+			<a class="btn btn-outline-danger" role="button" onclick="deleteArtist(this)" data-id="{{ artist.id }}">
+				<span class="fa fa-trash"></span>DELETE
+			</a>
+		</div>
+
 		<p class="subtitle">
-			ID: {{ artist.id }}
+			GENERES
 		</p>
+
 		<div class="genres">
 			{% for genre in artist.genres %}
 			<span class="genre">{{ genre }}</span>

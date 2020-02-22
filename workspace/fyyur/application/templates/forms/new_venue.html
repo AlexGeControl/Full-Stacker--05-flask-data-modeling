@@ -1,9 +1,13 @@
 {% extends 'layouts/main.html' %}
-{% block title %}New Venue{% endblock %}
+
+{% block title %}
+  New Venue
+{% endblock %}
+
 {% block content %}
   <div class="form-wrapper">
     <form class="form" method="post" action="/venues/create">
-      <h3 class="form-heading">List a new venue <a href="{{ url_for('main.index') }}" title="Back to homepage"><i class="fa fa-home pull-right"></i></a></h3>
+      <h3 class="form-heading">List a <strong>NEW</strong> venue <a href="{{ url_for('main.index') }}" title="Back to homepage"><i class="fa fa-home pull-right"></i></a></h3>
       <!-- contact info -->
       <div class="form-group">
         <label for="name">Name</label>
