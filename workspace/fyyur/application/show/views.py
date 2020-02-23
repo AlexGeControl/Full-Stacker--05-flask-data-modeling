@@ -1,7 +1,11 @@
-from flask import render_template, request, flash, redirect, url_for
+from application import db
+from application.models import Artist, Show, Venue
 
-from . import show
+from flask import abort, render_template, request, flash, redirect, url_for
+
+from . import bp
 from .forms import ShowForm
+from application.utils import convert_form_dict_to_dict
 
 #  ----------------------------------------------------------------
 #  routes
@@ -9,70 +13,107 @@ from .forms import ShowForm
 
 #  CREATE
 #  ----------------------------------------------------------------
-@show.route('/create')
+@bp.route('/create')
 def create_shows():
-    # renders form. do not touch.
+    """ render empty form
+    """
+    # load artists:
+    artists = Artist.query.with_entities(
+        Artist.id,
+        Artist.name
+    ).order_by(
+        Artist.name
+    ).all()
+    # load venues:
+    venues = Venue.query.with_entities(
+        Venue.id,
+        Venue.name
+    ).order_by(
+        Venue.name
+    ).all()    
+
+    # create form:
     form = ShowForm()
+    form.artist_id.choices = [
+        (artist.id, artist.name) for artist in artists
+    ]
+    form.venue_id.choices = [
+        (venue.id, venue.name) for venue in venues
+    ]
 
     return render_template('forms/new_show.html', form=form)
 
-@show.route('/create', methods=['POST'])
+@bp.route('/create', methods=['POST'])
 def create_show_submission():
-    # called to create new shows in the db, upon submitting new show listing form
-    # TODO: insert form data as a new Show record in the db, instead
+    """ create new venue using POSTed form
+    """
+    # parse POSTed form:
+    show_created = convert_form_dict_to_dict(request.form)
 
-    # on successful db insert, flash success
-    flash('Show was successfully listed!')
-    # TODO: on unsuccessful db insert, flash an error instead.
-    # e.g., flash('An error occurred. Show could not be listed.')
-    # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
+    try:
+        show = Show(**show_created)
+        db.session.add(show)
+        db.session.commit()
+        # on successful db insert, flash success
+        flash('Show was successfully listed!')
+    except:
+        db.session.rollback()
+        # on unsuccessful db insert, flash an error instead.
+        flash('An error occurred. Your show could not be listed.')
+    finally:
+        db.session.close()
 
     return render_template('pages/home.html')
 
 #  READ
 #  ----------------------------------------------------------------
-@show.route('/')
+@bp.route('/')
 def shows():
-    # displays list of shows at /shows
-    # TODO: replace with real venues data.
-    #       num_shows should be aggregated based on number of upcoming shows per venue.
-    data=[
+    ''' list shows
+    '''
+    # artists:
+    artists_subq = Artist.query.with_entities(
+        Artist.id,
+        Artist.name,
+        Artist.image_link
+    ).subquery()
+    # venues:
+    venues_subq = Venue.query.with_entities(
+        Venue.id,
+        Venue.name,
+        Venue.image_link
+    ).subquery()
+    # shows:
+    shows_subq = Show.query.with_entities(
+        Show.start_time,
+        Show.artist_id,
+        Show.venue_id
+    ).subquery()
+    
+    # join
+    data = db.session.query(
+        venues_subq.c.id,
+        venues_subq.c.name,
+        artists_subq.c.id,
+        artists_subq.c.name,
+        artists_subq.c.image_link,
+        shows_subq.c.start_time
+    ).join(
+        artists_subq, shows_subq.c.artist_id == artists_subq.c.id
+    ).join(
+        venues_subq, shows_subq.c.venue_id == venues_subq.c.id 
+    ).all()
+
+    # format:
+    shows = [
         {
-            "venue_id": 1,
-            "venue_name": "The Musical Hop",
-            "artist_id": 4,
-            "artist_name": "Guns N Petals",
-            "artist_image_link": "https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80",
-            "start_time": "2019-05-21T21:30:00.000Z"
-        }, {
-            "venue_id": 3,
-            "venue_name": "Park Square Live Music & Coffee",
-            "artist_id": 5,
-            "artist_name": "Matt Quevedo",
-            "artist_image_link": "https://images.unsplash.com/photo-1495223153807-b916f75de8c5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80",
-            "start_time": "2019-06-15T23:00:00.000Z"
-        }, {
-            "venue_id": 3,
-            "venue_name": "Park Square Live Music & Coffee",
-            "artist_id": 6,
-            "artist_name": "The Wild Sax Band",
-            "artist_image_link": "https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80",
-            "start_time": "2035-04-01T20:00:00.000Z"
-        }, {
-            "venue_id": 3,
-            "venue_name": "Park Square Live Music & Coffee",
-            "artist_id": 6,
-            "artist_name": "The Wild Sax Band",
-            "artist_image_link": "https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80",
-            "start_time": "2035-04-08T20:00:00.000Z"
-        }, {
-            "venue_id": 3,
-            "venue_name": "Park Square Live Music & Coffee",
-            "artist_id": 6,
-            "artist_name": "The Wild Sax Band",
-            "artist_image_link": "https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80",
-            "start_time": "2035-04-15T20:00:00.000Z"
-        }
+            "venue_id": venue_id,
+            "venue_name": venue_name,
+            "artist_id": artist_id,
+            "artist_name": artist_name,
+            "artist_image_link": artist_image_link,
+            "start_time": start_time.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+        } for (venue_id, venue_name, artist_id, artist_name, artist_image_link, start_time) in data
     ]
 
-    return render_template('pages/shows.html', shows=data)
+    return render_template('pages/shows.html', shows=shows)

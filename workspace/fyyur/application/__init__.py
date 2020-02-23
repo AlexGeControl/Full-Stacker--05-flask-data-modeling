@@ -33,7 +33,7 @@ def create_app(config_name):
 
     from .artist import bp as blueprint_artist
     app.register_blueprint(blueprint_artist, url_prefix='/artists')
-    from .show import show as blueprint_show
+    from .show import bp as blueprint_show
     app.register_blueprint(blueprint_show, url_prefix='/shows')
     from .venue import bp as blueprint_venue
     app.register_blueprint(blueprint_venue, url_prefix='/venues')

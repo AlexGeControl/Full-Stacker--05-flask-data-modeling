@@ -1,8 +1,9 @@
-# TODO: connect to a local postgresql database
 from application import db
 
 # pgsql array
 from sqlalchemy.dialects.postgresql import ARRAY
+
+from datetime import datetime
 
 #----------------------------------------------------------------------------#
 # Models.
@@ -29,6 +30,9 @@ class Artist(db.Model):
 
     seeking_venue = db.Column(db.Boolean, nullable=False, default=False)
     seeking_description = db.Column(db.String, nullable=True)
+
+    # relationship:
+    shows = db.relationship('Show', backref='artist', lazy=True)
 
     def __repr__(self):
         return f'<Artist id="{self.id}" name="{self.name}" city="{self.city}" state="{self.state}">'
@@ -76,15 +80,6 @@ class Artist(db.Model):
         self.seeking_description = json.get('seeking_description', '')
 
 
-class Show(db.Model):
-    """ table shows
-    """
-    # follow the best practice
-    __tablename__ = 'shows'
-
-    id = db.Column(db.Integer, primary_key=True)
-
-
 class Venue(db.Model):
     """ table venues
     """
@@ -108,6 +103,9 @@ class Venue(db.Model):
 
     seeking_talent = db.Column(db.Boolean, nullable=False, default=False)
     seeking_description = db.Column(db.String, nullable=True)
+
+    # relationship:
+    shows = db.relationship('Show', backref='venue', lazy=True)
 
     def __repr__(self):
         return f'<Venue id="{self.id}" name="{self.name}" city="{self.city}" state="{self.state}">'
@@ -155,3 +153,41 @@ class Venue(db.Model):
 
         self.seeking_talent = (json.get('seeking_talent', 'n') == 'y')
         self.seeking_description = json.get('seeking_description', '')
+
+
+class Show(db.Model):
+    """ table shows
+    """
+    # follow the best practice
+    __tablename__ = 'shows'
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    start_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    # relationship
+    artist_id = db.Column(db.Integer, db.ForeignKey('artists.id'), nullable=True)
+    venue_id = db.Column(db.Integer, db.ForeignKey('venues.id'), nullable=True)
+
+    def __repr__(self):
+        return f'<Show id="{self.id}" artist_id="{self.artist_id}" venue_id="{self.venue_id}">'
+
+    def to_json(self):
+        """ map show object to python dict
+        """
+        data = {
+            "id": self.id,
+            "start_time": self.start_time.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+            "artist_id": self.artist_id,
+            "venue_id": self.venue_id
+        }
+
+        return data
+
+    def from_json(self, json):
+        """ update show object using python dict input
+        """
+        self.start_time = datetime.utcnow if (not 'start_time' in json) else datetime.strptime(json['start_time'], "%Y-%m-%dT%H:%M:%S.%fZ")
+        
+        self.artist_id = int(json['artist_id'])
+        self.venue_id = int(json['venue_id'])
