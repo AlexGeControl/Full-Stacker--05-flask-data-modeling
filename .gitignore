@@ -1,4 +1,4 @@
-# postgres data
-data
-#
+# pg volumes
+volume
+# pyc
 *.pyc
