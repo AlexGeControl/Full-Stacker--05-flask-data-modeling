@@ -6,6 +6,8 @@ This is the project for data modeling of Udacity's Full Stack Development Nanode
 
 ## Up & Running
 
+### Deploy
+
 First, make a folder called **volume** for PostgresSQL Docker's storage on local filesystem:
 ```bash
 mkdir volume
@@ -23,6 +25,8 @@ Make sure the following ports on your host are not pre-occupied, then type:
 ```bash
 docker-compose up
 ```
+
+### Insert Init Data
 
 Next let's pop db with initial data. Use the following command to identify Fyyur App instance:
 ```bash
@@ -47,6 +51,8 @@ Use the following python statement to init all the data:
 from init_db import init_all; init_all(db, Artist, Show, Venue)
 ```
 
+### Verify DB Status
+
 Finally, go to http://localhost:8080 to verify all the data are inside
 
 <img src="doc/02-pg-adminer-login.png" width="100%" alt="Login" />
@@ -59,21 +65,21 @@ Finally, go to http://localhost:8080 to verify all the data are inside
 
 ## Data Models
 
-### Implement Data Models in Relational, Normalized Form.
+### Implement Data Models in Relational, Normalized Form
 
 The three data models are implemented inside <a href="workspace/fyyur/application/models.py">here</a>
 The migration is available inside <a href="workspace/fyyur/migrations">here</a>
 
-### Connect Data Models to a Database.
+### Connect Data Models to a Database
 
 The DB connection is specified in <a href="workspace/fyyur/config.py">here</a>
 
-### Demonstrate a Good Grasp of Database Normalization.
+### Demonstrate a Good Grasp of Database Normalization
 
 The three data models are implemented inside <a href="workspace/fyyur/application/models.py">here</a>
 The migration is available inside <a href="workspace/fyyur/migrations">here</a>
 
-### Demonstrate a Good Grasp of SQLAlchemy.
+### Demonstrate a Good Grasp of SQLAlchemy
 
 The queries used for artist views are inside <a href="workspace/fyyur/application/artist/views.py">here</a>
 The queries used for venues views are inside <a href="workspace/fyyur/application/venue/views.py">here</a>
@@ -83,7 +89,7 @@ The queries used for shows views are inside <a href="workspace/fyyur/application
 
 ## SQL
 
-### Use SQL Syntax to Select Records from a Database.
+### Use SQL Syntax to Select Records from a Database
 
 Here one query from artist view is used as example for **SELECT**. The queries used for artist views are inside <a href="workspace/fyyur/application/artist/views.py">here</a>
 ```python
@@ -122,7 +128,7 @@ def artists():
     return render_template('pages/artists.html', artists=artists)
 ```
 
-### Use SQL Syntax and SQLAlchemy to Join Relational Tables and Conduct Joined Queries.
+### Use SQL Syntax and SQLAlchemy to Join Relational Tables and Conduct Joined Queries
 
 Here one query from show view is used as example for **JOIN**. The queries used for show views are inside <a href="workspace/fyyur/application/show/views.py">here</a>
 
@@ -181,7 +187,7 @@ def shows():
     return render_template('pages/shows.html', shows=shows)
 ```
 
-### Use SQL to Create Records with Uniqueness Constraints.
+### Use SQL to Create Records with Uniqueness Constraints
 
 Here one query from show view is used as example for **INSERT INTO**. The queries used for show views are inside <a href="workspace/fyyur/application/show/views.py">here</a>
 
@@ -211,3 +217,12 @@ def create_show_submission():
 
 ---
 
+## Application Quality & Deployment
+
+### Demonstrate the Ability to Construct a Well-Organized Code Base
+
+The whole project follows the structure recommended by [Flask Mega Tutorial by Miguel Grinberg](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xv-a-better-application-structure)
+
+### Create a Web APP that Builds Successfully and Runs Without Errors
+
+Follow the instruction in section **Up & Running** to build and deploy the APP.
