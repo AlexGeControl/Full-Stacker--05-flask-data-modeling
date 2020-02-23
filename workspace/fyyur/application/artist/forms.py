@@ -1,23 +1,35 @@
 from datetime import datetime
 from flask_wtf import Form
 from wtforms import BooleanField, StringField, TextAreaField, SelectField, SelectMultipleField, DateTimeField
-from wtforms.validators import DataRequired, AnyOf, URL
+from wtforms.validators import DataRequired, Optional, URL, Regexp
 
 
 class ArtistForm(Form):
     # personal info:
     name = StringField(
-        'name', validators=[DataRequired()]
+        'name', 
+        validators = [
+            DataRequired()
+        ]
     )
     image_link = StringField(
-        'image_link', validators=[URL()]
+        'image_link', 
+        validators = [
+            Optional(), URL()
+        ]
     )
     # address:
     city = StringField(
-        'city', validators=[DataRequired()]
+        'city', 
+        validators = [
+            DataRequired()
+        ]
     )
     state = SelectField(
-        'state', validators=[DataRequired()],
+        'state', 
+        validators = [
+            DataRequired()
+        ],
         choices=[
             ('AL', 'AL'),
             ('AK', 'AK'),
@@ -74,18 +86,32 @@ class ArtistForm(Form):
     )
     # contact:
     phone = StringField(
-        'phone'
+        'phone',
+        validators=[
+            DataRequired(), 
+            Regexp('^\d{3}-\d{3}-\d{4}$', message="Please fill out a valid phone number.")
+        ]
     )
     website = StringField(
-        'website', validators=[URL()]
+        'website', 
+        validators=[
+            Optional(), 
+            URL()
+        ]
     )
     facebook_link = StringField(
-        'facebook_link', validators=[URL()]
+        'facebook_link', 
+        validators = [
+            Optional(), 
+            URL()
+        ]
     )
     # genres:
     genres = SelectMultipleField(
-        # TODO implement enum restriction
-        'genres', validators=[DataRequired()],
+        'genres', 
+        validators = [
+            DataRequired()
+        ],
         choices=[
             ('Alternative', 'Alternative'),
             ('Blues', 'Blues'),
@@ -111,7 +137,13 @@ class ArtistForm(Form):
     # venue seeking:
     seeking_venue = BooleanField(
         'seeking_venue',
+        validators = [
+            Optional()
+        ]
     )
     seeking_description = TextAreaField(
         'seeking_description',
+        validators = [
+            Optional()
+        ]
     )

@@ -1,23 +1,35 @@
 from datetime import datetime
 from flask_wtf import Form
 from wtforms import BooleanField, StringField, TextAreaField, SelectField, SelectMultipleField, DateTimeField
-from wtforms.validators import DataRequired, AnyOf, URL
+from wtforms.validators import DataRequired, Optional, URL, Regexp
 
 
 class VenueForm(Form):
     # personal info:
     name = StringField(
-        'name', validators=[DataRequired()]
+        'name', 
+        validators = [
+            DataRequired()
+        ]
     )
     image_link = StringField(
-        'image_link', validators=[URL()]
+        'image_link', 
+        validators = [
+            URL()
+        ]
     )
     # address:
     city = StringField(
-        'city', validators=[DataRequired()]
+        'city', 
+        validators = [
+            DataRequired()
+        ]
     )
     state = SelectField(
-        'state', validators=[DataRequired()],
+        'state', 
+        validators = [
+            DataRequired()
+        ],
         choices=[
             ('AL', 'AL'),
             ('AK', 'AK'),
@@ -73,29 +85,36 @@ class VenueForm(Form):
         ]
     )
     address = StringField(
-        'address', validators=[DataRequired()]
+        'address', 
+        validators = [
+            DataRequired()
+        ]
     )
     # contact:
     phone = StringField(
-        'phone'
+        'phone',
+        validators=[
+            DataRequired(), 
+            Regexp('^\d{3}-\d{3}-\d{4}$', message="Please fill out a valid phone number.")
+        ]
     )
     website = StringField(
-        'website', validators=[URL()]
+        'website', 
+        validators = [
+            Optional(), URL()
+        ]
     )
     facebook_link = StringField(
-        'facebook_link', validators=[URL()]
+        'facebook_link', 
+        validators = [
+            Optional(), URL()
+        ]
     )
     # genres:
     genres = SelectMultipleField(
-        'genres', validators=[
-            DataRequired(),
-            # TODO implement enum restriction
-            AnyOf(
-                [
-                    'Alternative',
-                    'Blues',                  
-                ]
-            )
+        'genres', 
+        validators = [
+            DataRequired()
         ],
         choices=[
             ('Alternative', 'Alternative'),
@@ -122,7 +141,13 @@ class VenueForm(Form):
     # talent seeking:
     seeking_talent = BooleanField(
         'seeking_talent',
+        validators = [
+            Optional()
+        ]
     )
     seeking_description = TextAreaField(
         'seeking_description',
+        validators = [
+            Optional()
+        ]
     )
